@@ -1,5 +1,4 @@
 export const transcribeAudio = async (token: string, file: File, language?: string) => {
-	console.warn('Audio transcription is not available');
 	return { text: '' };
 };
 
@@ -9,7 +8,6 @@ export const synthesizeOpenAISpeech = async (
 	text: string = '',
 	model?: string
 ) => {
-	console.warn('Speech synthesis is not available');
 	return null;
 };
 

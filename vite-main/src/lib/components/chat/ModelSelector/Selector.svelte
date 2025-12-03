@@ -181,7 +181,7 @@
         };
 
         const pullModelHandler = async () => {
-                toast.info($i18n.t('Model pulling is not available'));
+                // Model pulling not supported
         };
 
         onMount(async () => {
@@ -211,7 +211,7 @@
         };
 
         const unloadModelHandler = async (model: string) => {
-                toast.info($i18n.t('Model unloading is not available'));
+                // Model unloading not supported
         };
 </script>
 

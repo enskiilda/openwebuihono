@@ -50,7 +50,11 @@
 	let loading = false;
 
 	const verifyHandler = () => {
-		toast.success($i18n.t('Connection settings look valid'));
+		if (url) {
+			toast.success($i18n.t('Connection URL is set'));
+		} else {
+			toast.error($i18n.t('URL is required'));
+		}
 	};
 
 	const addModelHandler = () => {
