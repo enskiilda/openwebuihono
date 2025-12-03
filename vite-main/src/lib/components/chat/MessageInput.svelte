@@ -83,8 +83,8 @@
     >
       <div class="flex-1 overflow-auto max-h-52">
         <Textarea
-          bind:this={textareaRef}
-          {message}
+          bind:ref={textareaRef}
+          value={message}
           on:input={handleTextareaChange}
           on:keydown={handleKeyDown}
           placeholder="Ask anything"
