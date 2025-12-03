@@ -1128,16 +1128,11 @@
                                                                 </div>
                                                         {/if}
 
-                                                        <div class="px-2.5">
-                                                                <div
-                                                                        class="scrollbar-hidden rtl:text-right ltr:text-left bg-transparent dark:text-gray-100 outline-hidden w-full pb-1 px-1 resize-none h-fit max-h-96 overflow-auto {files.length ===
-                                                                        0
-                                                                                ? atSelectedModel !== undefined
-                                                                                        ? 'pt-1.5'
-                                                                                        : 'pt-2.5'
-                                                                                : ''}"
-                                                                        id="chat-input-container"
-                                                                >
+                                                        <div
+                                                                class="flex min-h-14 items-center overflow-x-hidden px-1.5 -my-2.5"
+                                                                style="grid-area: primary;"
+                                                        >
+                                                                <div class="flex-1 overflow-auto max-h-52">
                                                                         {#if suggestions}
                                                                                 {#key $settings?.richTextInput ?? true}
                                                                                         {#key $settings?.showFormattingToolbar ?? false}
@@ -1317,57 +1312,31 @@
                                                                 </div>
                                                         </div>
 
-                                                        <div class="flex justify-between mt-0.5 p-1 pt-0 max-w-full" dir="ltr">
-                                                                <div class="self-end flex items-center flex-1 max-w-[80%]">
-                                                                        {#if selectedModelIds.length === 1 && $models.find((m) => m.id === selectedModelIds[0])?.has_user_valves}
-                                                                                <div class="ml-1 flex gap-1.5">
-                                                                                        <Tooltip content="" placement="top">
-                                                                                                <button
-                                                                                                        id="model-valves-button"
-                                                                                                        class="bg-transparent hover:bg-gray-100 text-gray-700 dark:text-white dark:hover:bg-gray-800 rounded-full size-8 flex justify-center items-center outline-hidden focus:outline-hidden"
-                                                                                                        on:click={() => {
-                                                                                                                selectedValvesType = 'function';
-                                                                                                                selectedValvesItemId = selectedModelIds[0]?.split('.')[0];
-                                                                                                                showValvesModal = true;
-                                                                                                        }}
-                                                                                                >
-                                                                                                        <Knobs className="size-4" strokeWidth="1.5" />
-                                                                                                </button>
-                                                                                        </Tooltip>
-                                                                                </div>
-                                                                        {/if}
+                                                        <div class="flex items-center gap-2" style="grid-area: trailing;">
+                                                                <div class="ms-auto flex items-center gap-1.5">
+                                                                        <button
+                                                                                id="send-message-button"
+                                                                                class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 size-9 h-9 w-9 rounded-full"
+                                                                                type={generating ? 'button' : 'submit'}
+                                                                                disabled={!generating && (prompt === '' && files.length === 0)}
+                                                                                on:click={() => {
+                                                                                        if (generating) {
+                                                                                                stopResponse();
+                                                                                        }
+                                                                                }}
+                                                                        >
+                                                                                {#if generating}
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-icon lucide-square">
+                                                                                                <rect width="18" height="18" x="3" y="3" rx="2" />
+                                                                                        </svg>
+                                                                                {:else}
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-icon lucide-arrow-up">
+                                                                                                <path d="m5 12 7-7 7 7" />
+                                                                                                <path d="M12 19V5" />
+                                                                                        </svg>
+                                                                                {/if}
+                                                                        </button>
                                                                 </div>
-
-                                <div class="ml-auto self-end flex items-center gap-2 shrink-0">
-                                        <Tooltip content="">
-                                                <button
-                                                        id="send-message-button"
-                                                        class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors focus-visible:outline-none {generating
-                                                                ? 'bg-white hover:bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-800'
-                                                                : !(prompt === '' && files.length === 0)
-                                                                        ? 'bg-black text-white hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/80'
-                                                                        : 'bg-black/40 text-white dark:bg-[#515151] dark:text-gray-400 disabled:pointer-events-none'}"
-                                                        type={generating ? 'button' : 'submit'}
-                                                        disabled={!generating && (prompt === '' && files.length === 0)}
-                                                        on:click={() => {
-                                                                if (generating) {
-                                                                        stopResponse();
-                                                                }
-                                                        }}
-                                                >
-                                                        {#if generating}
-                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
-                                                                        <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm6-2.438c0-.724.588-1.312 1.313-1.312h4.874c.725 0 1.313.588 1.313 1.313v4.874c0 .725-.588 1.313-1.313 1.313H9.564a1.312 1.312 0 01-1.313-1.313V9.564z" clip-rule="evenodd" />
-                                                                </svg>
-                                                        {:else}
-                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-6">
-                                                                        <path d="M12 5.25L12 18.75" />
-                                                                        <path d="M18.75 12L12 5.25L5.25 12" />
-                                                                </svg>
-                                                        {/if}
-                                                </button>
-                                        </Tooltip>
-                                </div>
                                                         </div>
                                                 </div>
 
