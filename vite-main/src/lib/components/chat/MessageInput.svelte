@@ -1011,7 +1011,7 @@
 
                                                 <div
                                                         id="message-input-container"
-                                                        class="w-full max-w-2xl mx-auto bg-transparent dark:bg-muted/50 cursor-text overflow-clip bg-clip-padding p-2.5 shadow-lg border border-border transition-all duration-200 rounded-[28px] grid grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto]"
+                                                        class="w-full max-w-2xl mx-auto bg-white dark:bg-[#303030] cursor-text overflow-clip bg-clip-padding p-2.5 shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 rounded-[28px] grid grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto]"
                                                         style="grid-template-areas: 'header header header' 'leading primary trailing' '. footer .';"
                                                         dir={$settings?.chatDirection ?? 'auto'}
                                                 >
