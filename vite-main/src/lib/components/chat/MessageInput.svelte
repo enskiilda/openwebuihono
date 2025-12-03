@@ -1010,7 +1010,8 @@
 
                                                 <div
                                                         id="message-input-container"
-                                                        class="flex-1 flex flex-col relative w-full rounded-[28px] p-2 shadow-sm transition-colors bg-white border border-gray-200 dark:bg-[#303030] dark:border-transparent dark:text-gray-100 cursor-text"
+                                                        class="w-full max-w-2xl mx-auto bg-transparent dark:bg-muted/50 cursor-text overflow-clip bg-clip-padding p-2.5 shadow-lg border border-border transition-all duration-200 rounded-[28px] grid grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto]"
+                                                        style="grid-template-areas: 'header header header' 'leading primary trailing' '. footer .';"
                                                         dir={$settings?.chatDirection ?? 'auto'}
                                                 >
                                                         {#if atSelectedModel !== undefined}
