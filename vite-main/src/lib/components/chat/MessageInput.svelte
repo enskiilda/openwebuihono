@@ -63,6 +63,7 @@
         import Wrench from '../icons/Wrench.svelte';
         import CommandLine from '../icons/CommandLine.svelte';
         import Sparkles from '../icons/Sparkles.svelte';
+        import Plus from '../icons/Plus.svelte';
 
         import InputVariablesModal from './MessageInput/InputVariablesModal.svelte';
         import Voice from '../icons/Voice.svelte';
@@ -1127,6 +1128,19 @@
                                                                         {/each}
                                                                 </div>
                                                         {/if}
+
+                                                        <!-- Leading section with + button -->
+                                                        <div class="flex" style="grid-area: leading;">
+                                                                <button
+                                                                        type="button"
+                                                                        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9 h-9 w-9 rounded-full"
+                                                                        on:click={() => {
+                                                                                filesInputElement.click();
+                                                                        }}
+                                                                >
+                                                                        <Plus className="size-6 text-muted-foreground" />
+                                                                </button>
+                                                        </div>
 
                                                         <div
                                                                 class="flex min-h-14 items-center overflow-x-hidden px-1.5 -my-2.5"
