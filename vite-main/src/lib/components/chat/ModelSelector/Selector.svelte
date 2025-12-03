@@ -12,8 +12,6 @@
         import { createEventDispatcher, onMount, getContext, tick } from 'svelte';
         import { goto } from '$app/navigation';
 
-        import { deleteModel, getOllamaVersion, pullModel, unloadModel } from '$lib/apis/ollama';
-
         import {
                 user,
                 MODEL_DOWNLOAD_POOL,
@@ -71,7 +69,6 @@
         let selectedTag = '';
         let selectedConnectionType = '';
 
-        let ollamaVersion = null;
         let selectedModelIdx = 0;
 
         const fuse = new Fuse(
@@ -184,132 +181,7 @@
         };
 
         const pullModelHandler = async () => {
-                const sanitizedModelTag = searchValue.trim().replace(/^ollama\s+(run|pull)\s+/, '');
-
-                if ($MODEL_DOWNLOAD_POOL[sanitizedModelTag]) {
-                        toast.error(
-                                $i18n.t(`Model '{{modelTag}}' is already in queue for downloading.`, {
-                                        modelTag: sanitizedModelTag
-                                })
-                        );
-                        return;
-                }
-                if (Object.keys($MODEL_DOWNLOAD_POOL).length === 3) {
-                        toast.error(
-                                $i18n.t('Maximum of 3 models can be downloaded simultaneously. Please try again later.')
-                        );
-                        return;
-                }
-
-                const [res, controller] = await pullModel(localStorage.token, sanitizedModelTag, '0').catch(
-                        (error) => {
-                                toast.error(`${error}`);
-                                return null;
-                        }
-                );
-
-                if (res) {
-                        const reader = res.body
-                                .pipeThrough(new TextDecoderStream())
-                                .pipeThrough(splitStream('\n'))
-                                .getReader();
-
-                        MODEL_DOWNLOAD_POOL.set({
-                                ...$MODEL_DOWNLOAD_POOL,
-                                [sanitizedModelTag]: {
-                                        ...$MODEL_DOWNLOAD_POOL[sanitizedModelTag],
-                                        abortController: controller,
-                                        reader,
-                                        done: false
-                                }
-                        });
-
-                        while (true) {
-                                try {
-                                        const { value, done } = await reader.read();
-                                        if (done) break;
-
-                                        let lines = value.split('\n');
-
-                                        for (const line of lines) {
-                                                if (line !== '') {
-                                                        let data = JSON.parse(line);
-                                                        if (data.error) {
-                                                                throw data.error;
-                                                        }
-                                                        if (data.detail) {
-                                                                throw data.detail;
-                                                        }
-
-                                                        if (data.status) {
-                                                                if (data.digest) {
-                                                                        let downloadProgress = 0;
-                                                                        if (data.completed) {
-                                                                                downloadProgress = Math.round((data.completed / data.total) * 1000) / 10;
-                                                                        } else {
-                                                                                downloadProgress = 100;
-                                                                        }
-
-                                                                        MODEL_DOWNLOAD_POOL.set({
-                                                                                ...$MODEL_DOWNLOAD_POOL,
-                                                                                [sanitizedModelTag]: {
-                                                                                        ...$MODEL_DOWNLOAD_POOL[sanitizedModelTag],
-                                                                                        pullProgress: downloadProgress,
-                                                                                        digest: data.digest
-                                                                                }
-                                                                        });
-                                                                } else {
-                                                                        toast.success(data.status);
-
-                                                                        MODEL_DOWNLOAD_POOL.set({
-                                                                                ...$MODEL_DOWNLOAD_POOL,
-                                                                                [sanitizedModelTag]: {
-                                                                                        ...$MODEL_DOWNLOAD_POOL[sanitizedModelTag],
-                                                                                        done: data.status === 'success'
-                                                                                }
-                                                                        });
-                                                                }
-                                                        }
-                                                }
-                                        }
-                                } catch (error) {
-                                        if (typeof error !== 'string') {
-                                                error = error.message;
-                                        }
-
-                                        toast.error(`${error}`);
-                                        // opts.callback({ success: false, error, modelName: opts.modelName });
-                                        break;
-                                }
-                        }
-
-                        if ($MODEL_DOWNLOAD_POOL[sanitizedModelTag].done) {
-                                toast.success(
-                                        $i18n.t(`Model '{{modelName}}' has been successfully downloaded.`, {
-                                                modelName: sanitizedModelTag
-                                        })
-                                );
-
-                                models.set(
-                                        await getModels(
-                                                localStorage.token,
-                                                $config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
-                                        )
-                                );
-                        } else {
-                                toast.error($i18n.t('Download canceled'));
-                        }
-
-                        delete $MODEL_DOWNLOAD_POOL[sanitizedModelTag];
-
-                        MODEL_DOWNLOAD_POOL.set({
-                                ...$MODEL_DOWNLOAD_POOL
-                        });
-                }
-        };
-
-        const setOllamaVersion = async () => {
-                ollamaVersion = await getOllamaVersion(localStorage.token).catch((error) => false);
+                toast.info($i18n.t('Model pulling is not available'));
         };
 
         onMount(async () => {
@@ -323,10 +195,6 @@
                 }
         });
 
-        $: if (show) {
-                setOllamaVersion();
-        }
-
         const cancelModelPullHandler = async (model: string) => {
                 const { reader, abortController } = $MODEL_DOWNLOAD_POOL[model];
                 if (abortController) {
@@ -338,25 +206,12 @@
                         MODEL_DOWNLOAD_POOL.set({
                                 ...$MODEL_DOWNLOAD_POOL
                         });
-                        await deleteModel(localStorage.token, model);
                         toast.success($i18n.t('{{model}} download has been canceled', { model: model }));
                 }
         };
 
         const unloadModelHandler = async (model: string) => {
-                const res = await unloadModel(localStorage.token, model).catch((error) => {
-                        toast.error($i18n.t('Error unloading model: {{error}}', { error }));
-                });
-
-                if (res) {
-                        toast.success($i18n.t('Model unloaded successfully'));
-                        models.set(
-                                await getModels(
-                                        localStorage.token,
-                                        $config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
-                                )
-                        );
-                }
+                toast.info($i18n.t('Model unloading is not available'));
         };
 </script>
 
@@ -528,26 +383,6 @@
                                                 </div>
                                         </div>
                                 {/each}
-
-                                {#if !(searchValue.trim() in $MODEL_DOWNLOAD_POOL) && searchValue && ollamaVersion && $user?.role === 'admin'}
-                                        <Tooltip
-                                                content={$i18n.t(`Pull "{{searchValue}}" from Ollama.com`, {
-                                                        searchValue: searchValue
-                                                })}
-                                                placement="top-start"
-                                        >
-                                                <button
-                                                        class="flex w-full font-medium line-clamp-1 select-none items-center rounded-button py-2 pl-3 pr-1.5 text-sm text-gray-700 dark:text-gray-100 outline-hidden transition-all duration-75 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl cursor-pointer data-highlighted:bg-muted"
-                                                        on:click={() => {
-                                                                pullModelHandler();
-                                                        }}
-                                                >
-                                                        <div class=" truncate">
-                                                                {$i18n.t(`Pull "{{searchValue}}" from Ollama.com`, { searchValue: searchValue })}
-                                                        </div>
-                                                </button>
-                                        </Tooltip>
-                                {/if}
 
                                 {#each Object.keys($MODEL_DOWNLOAD_POOL) as model}
                                         <div

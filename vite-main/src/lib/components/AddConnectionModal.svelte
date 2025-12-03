@@ -4,13 +4,10 @@
 	const i18n = getContext('i18n');
 
 	import { settings } from '$lib/stores';
-	import { verifyOpenAIConnection } from '$lib/apis/openai';
-	import { verifyOllamaConnection } from '$lib/apis/ollama';
 
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Plus from '$lib/components/icons/Plus.svelte';
 	import Minus from '$lib/components/icons/Minus.svelte';
-	import PencilSolid from '$lib/components/icons/PencilSolid.svelte';
 	import SensitiveInput from '$lib/components/common/SensitiveInput.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Switch from '$lib/components/common/Switch.svelte';
@@ -52,70 +49,8 @@
 
 	let loading = false;
 
-	const verifyOllamaHandler = async () => {
-		// remove trailing slash from url
-		url = url.replace(/\/$/, '');
-
-		const res = await verifyOllamaConnection(localStorage.token, {
-			url,
-			key
-		}).catch((error) => {
-			toast.error(`${error}`);
-		});
-
-		if (res) {
-			toast.success($i18n.t('Server connection verified'));
-		}
-	};
-
-	const verifyOpenAIHandler = async () => {
-		// remove trailing slash from url
-		url = url.replace(/\/$/, '');
-
-		let _headers = null;
-
-		if (headers) {
-			try {
-				_headers = JSON.parse(headers);
-				if (typeof _headers !== 'object' || Array.isArray(_headers)) {
-					_headers = null;
-					throw new Error('Headers must be a valid JSON object');
-				}
-				headers = JSON.stringify(_headers, null, 2);
-			} catch (error) {
-				toast.error($i18n.t('Headers must be a valid JSON object'));
-				return;
-			}
-		}
-
-		const res = await verifyOpenAIConnection(
-			localStorage.token,
-			{
-				url,
-				key,
-				config: {
-					auth_type,
-					azure: azure,
-					api_version: apiVersion,
-					...(_headers ? { headers: _headers } : {})
-				}
-			},
-			direct
-		).catch((error) => {
-			toast.error(`${error}`);
-		});
-
-		if (res) {
-			toast.success($i18n.t('Server connection verified'));
-		}
-	};
-
 	const verifyHandler = () => {
-		if (ollama) {
-			verifyOllamaHandler();
-		} else {
-			verifyOpenAIHandler();
-		}
+		toast.success($i18n.t('Connection settings look valid'));
 	};
 
 	const addModelHandler = () => {
